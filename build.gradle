@@ -1,0 +1,33 @@
+plugins {
+    id 'application'
+}
+
+group = 'kr.loldiscordbot'
+version = '0.1.0-demo'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('net.dv8tion:JDA:6.7.0') {
+        // This demo does not use Discord voice/audio features.
+        exclude module: 'opus-java'
+        exclude module: 'tink'
+    }
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.17'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    mainClass = 'kr.loldiscordbot.Main'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
