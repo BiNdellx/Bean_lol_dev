@@ -1,6 +1,9 @@
 # Secrets
 .env
 
+# Runtime data
+data/
+
 # Gradle / build output
 .gradle/
 .gradle-dist/

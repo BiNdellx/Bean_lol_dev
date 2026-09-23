@@ -7,7 +7,7 @@ public enum Lane {
     JUNGLE("정글", "JUNGLE"),
     MID("미드", "MID"),
     ADC("원딜", "ADC"),
-    SUPPORT("서포터", "SUPPORT");
+    SUPPORT("서폿", "SUPPORT");
 
     private final String koreanName;
     private final String value;
