@@ -54,6 +54,18 @@ public final class Main {
                 )
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
 
+        var resetProfileCommand = Commands.slash(
+                        BotListener.RESET_PROFILE_COMMAND,
+                        "특정 유저의 내전방 프로필 설정과 접근 권한을 초기화합니다."
+                )
+                .addOption(
+                        OptionType.USER,
+                        BotListener.RESET_PROFILE_USER_OPTION,
+                        "프로필을 초기화할 유저",
+                        true
+                )
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
+
         if (config.hasGuildId()) {
             Guild guild = jda.getGuildById(config.guildId());
             if (guild == null) {
@@ -63,7 +75,7 @@ public final class Main {
             }
 
             guild.updateCommands()
-                    .addCommands(setupCommand)
+                    .addCommands(setupCommand, resetProfileCommand)
                     .queue(
                             ignored -> System.out.printf("Registered /%s in guild %s%n", BotListener.SETUP_COMMAND, guild.getName()),
                             error -> System.err.println("Failed to register guild command: " + error.getMessage())
@@ -72,7 +84,7 @@ public final class Main {
         }
 
         jda.updateCommands()
-                .addCommands(setupCommand)
+                .addCommands(setupCommand, resetProfileCommand)
                 .queue(
                         ignored -> System.out.printf("Registered global /%s command%n", BotListener.SETUP_COMMAND),
                         error -> System.err.println("Failed to register global command: " + error.getMessage())

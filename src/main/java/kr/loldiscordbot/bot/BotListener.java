@@ -30,6 +30,8 @@ import net.dv8tion.jda.api.modals.Modal;
 public final class BotListener extends ListenerAdapter {
 
     public static final String SETUP_COMMAND = "setup";
+    public static final String RESET_PROFILE_COMMAND = "reset_profile";
+    public static final String RESET_PROFILE_USER_OPTION = "user";
     public static final String SETUP_DEFAULT_ROLE_SUBCOMMAND = "default_role";
     public static final String SETUP_IDENTIFY_ROLE_SUBCOMMAND = "identify_role";
     public static final String DEFAULT_ROLE_OPTION = "role";
@@ -59,7 +61,7 @@ public final class BotListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(SETUP_COMMAND)) {
+        if (!event.getName().equals(SETUP_COMMAND) && !event.getName().equals(RESET_PROFILE_COMMAND)) {
             return;
         }
 
@@ -68,6 +70,11 @@ public final class BotListener extends ListenerAdapter {
             event.reply("이 명령어는 서버 관리자만 사용할 수 있습니다.")
                     .setEphemeral(true)
                     .queue();
+            return;
+        }
+
+        if (event.getName().equals(RESET_PROFILE_COMMAND)) {
+            handleResetProfile(event);
             return;
         }
 
@@ -90,6 +97,76 @@ public final class BotListener extends ListenerAdapter {
         event.reply("지원하지 않는 setup 명령입니다.")
                 .setEphemeral(true)
                 .queue();
+    }
+
+
+    private void handleResetProfile(SlashCommandInteractionEvent event) {
+        Guild guild = event.getGuild();
+        if (guild == null) {
+            return;
+        }
+
+        var option = event.getOption(RESET_PROFILE_USER_OPTION);
+        if (option == null) {
+            event.reply("초기화할 유저를 선택해주세요.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        Member target = option.getAsMember();
+        if (target == null) {
+            event.reply("해당 유저를 현재 서버에서 찾을 수 없습니다.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        if (!guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+            event.reply("봇에게 `역할 관리` 권한이 없습니다. 먼저 봇 권한을 확인해주세요.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        List<Role> rolesToRemove = new ArrayList<>();
+
+        for (Role role : getConfiguredProfileRoles(guild)) {
+            if (target.getRoles().contains(role) && guild.getSelfMember().canInteract(role)) {
+                rolesToRemove.add(role);
+            }
+        }
+
+        Role defaultRole = getConfiguredDefaultRole(guild);
+        if (defaultRole != null
+                && target.getRoles().contains(defaultRole)
+                && guild.getSelfMember().canInteract(defaultRole)
+                && !rolesToRemove.contains(defaultRole)) {
+            rolesToRemove.add(defaultRole);
+        }
+
+        profileSelections.remove(target.getIdLong());
+
+        if (rolesToRemove.isEmpty()) {
+            event.reply(target.getAsMention() + " 유저에게 초기화할 프로필 역할이 없습니다.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        event.deferReply(true).queue(hook -> guild.modifyMemberRoles(target, List.of(), rolesToRemove).queue(
+                success -> hook.editOriginal(
+                                "✅ " + target.getAsMention() + " 유저의 내전방 프로필을 초기화했습니다.
+"
+                                        + "라인/티어 역할과 내전방 접근 역할이 제거되었습니다."
+                        )
+                        .queue(),
+                error -> hook.editOriginal(
+                                "프로필 초기화 중 오류가 발생했습니다.
+오류: " + rootMessage(error)
+                        )
+                        .queue()
+        ));
     }
 
     private void handleSetupDefaultRole(SlashCommandInteractionEvent event) {
