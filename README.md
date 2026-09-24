@@ -1,131 +1,94 @@
-# LoLDiscordBot
-
-Java + JDA 기반 League of Legends Discord 서버용 봇의 데모 프로젝트입니다.
-
-## Demo v0.1.0
-
-현재 구현 범위는 의도적으로 작습니다.
-
-1. Discord에서 `/line` 명령어 실행
-2. 드롭다운 메뉴에서 라인 선택
-   - 탑
-   - 정글
-   - 미드
-   - 원딜
-   - 서포터
-3. 선택한 라인을 Discord 메시지로 출력
-
-아직 역할 지급, DB 저장, 공지 확인, 채널 권한 변경은 구현하지 않았습니다.
+# Bean_lol_dev
 
 ## Requirements
 
-- Linux: Ubuntu 26.04 목표
-- Java 21
-- `curl`
-- `unzip`
-- Discord Bot Token
+- **Java 21 JDK**
+- **Git**
+- **Discord Bot Token**
+- **Discord Server ID (Guild ID)**
+- Final execution environment: **Ubuntu 26.04**
 
-프로젝트의 `run.sh`가 Gradle 9.7.1을 프로젝트 내부 `.gradle-dist/`에 자동 설치하므로 시스템에 Gradle을 별도로 설치할 필요가 없습니다.
+Ubuntu ARM64 환경에서는 Java 21 JDK가 다음 경로에 설치되어 있어야 합니다.
 
-## Discord Bot 준비
+```text
+/usr/lib/jvm/java-21-openjdk-arm64
+```
 
-Discord Developer Portal에서 Application과 Bot을 생성하고 서버에 초대합니다.
-
-이 데모는 메시지 내용을 읽지 않기 때문에 Message Content Intent를 요구하지 않습니다.
-
-서버 초대 시 최소한 다음 scope를 사용합니다.
-
-- `bot`
-- `applications.commands`
-
-## 실행
+필수 패키지 설치:
 
 ```bash
-cp .env.example .env
+sudo apt update
+sudo apt install -y git openjdk-21-jdk
+```
+
+설치 확인:
+
+```bash
+java -version
+javac -version
+```
+
+`javac` 버전은 **21**이어야 합니다.
+
+## Installation
+
+### 1. Repository Clone
+
+```bash
+git clone https://github.com/BiNdellx/Bean_lol_dev.git
+cd Bean_lol_dev
+```
+
+### 2. Environment Configuration
+
+프로젝트 루트에 `.env` 파일을 생성합니다.
+
+```bash
 nano .env
 ```
 
-`.env`에 토큰을 입력합니다.
+다음 값을 설정합니다.
 
 ```env
-BOT_TOKEN=your_real_bot_token
-DISCORD_GUILD_ID=your_test_server_id
+BOT_TOKEN=YOUR_DISCORD_BOT_TOKEN
+DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID
 ```
 
-테스트 단계에서는 `DISCORD_GUILD_ID`를 넣는 것을 권장합니다. Guild command는 변경 사항을 빠르게 확인할 수 있습니다.
+> `.env`에는 Discord Bot Token이 포함되므로 Git에 업로드하지 마세요.
+
+### 3. Run
 
 실행 권한을 부여합니다.
 
 ```bash
-chmod +x run.sh build.sh scripts/gradle-bootstrap.sh
+chmod +x run.sh
 ```
 
-봇 실행:
+봇을 실행합니다.
 
 ```bash
 ./run.sh
 ```
 
-`run.sh`는 다음 작업을 자동으로 수행합니다.
+`run.sh`는 Ubuntu ARM64 환경에서 Java 21 JDK를 다음 경로로 지정하여 실행합니다.
 
-1. `.env` 로드
-2. Gradle 9.7.1 존재 여부 확인
-3. 필요한 경우 Gradle 다운로드
-4. 프로젝트 빌드
-5. 봇 실행
+```text
+/usr/lib/jvm/java-21-openjdk-arm64
+```
 
-## Build only
+GitHub의 최신 업데이트를 서버에 적용할 때는 다음 명령을 사용합니다.
 
 ```bash
-./build.sh
+git pull origin main
+./run.sh
 ```
 
-빌드 결과는 다음 경로에 생성됩니다.
+## License
 
-```text
-build/install/LoLDiscordBot/
-```
+이 프로젝트는 **개인 학습 및 비상업적 용도**로만 사용할 수 있습니다.
 
-## Project structure
+- 개인 학습 및 연구 목적의 사용을 허용합니다.
+- 상업적 이용, 판매, 유료 서비스 제공 등 영리 목적의 사용을 허용하지 않습니다.
+- 프로젝트 또는 소스 코드를 상업적 제품이나 서비스에 포함하여 사용할 수 없습니다.
 
-```text
-LoLDiscordBot/
-├── .env.example
-├── .gitignore
-├── build.gradle
-├── settings.gradle
-├── build.sh
-├── run.sh
-├── scripts/
-│   └── gradle-bootstrap.sh
-└── src/main/java/kr/loldiscordbot/
-    ├── Main.java
-    ├── bot/
-    │   ├── BotListener.java
-    │   └── Lane.java
-    └── config/
-        └── BotConfig.java
-```
-
-## Git
-
-`.env`는 `.gitignore`에 포함되어 있으므로 실제 Bot Token은 저장소에 올라가지 않습니다.
-
-```bash
-git init
-git add .
-git commit -m "Initial Discord lane selection demo"
-```
-
-## Planned next step
-
-다음 버전에서는 다음 흐름으로 확장할 수 있습니다.
-
-```text
-신규 유저 입장
-  -> 주 라인 선택
-  -> 부 라인 선택
-  -> 공지 확인
-  -> MEMBER 및 라인 역할 지급
-  -> 일반 채널 공개
-```
+Copyright © BiNdellx. All rights reserved.
