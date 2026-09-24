@@ -156,14 +156,12 @@ public final class BotListener extends ListenerAdapter {
 
         event.deferReply(true).queue(hook -> guild.modifyMemberRoles(target, List.of(), rolesToRemove).queue(
                 success -> hook.editOriginal(
-                                "✅ " + target.getAsMention() + " 유저의 내전방 프로필을 초기화했습니다.
-"
+                                "✅ " + target.getAsMention() + " 유저의 내전방 프로필을 초기화했습니다.\n"
                                         + "라인/티어 역할과 내전방 접근 역할이 제거되었습니다."
                         )
                         .queue(),
                 error -> hook.editOriginal(
-                                "프로필 초기화 중 오류가 발생했습니다.
-오류: " + rootMessage(error)
+                                "프로필 초기화 중 오류가 발생했습니다.\n오류: " + rootMessage(error)
                         )
                         .queue()
         ));
